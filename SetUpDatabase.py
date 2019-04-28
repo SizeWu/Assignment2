@@ -6,12 +6,12 @@ import Patent
 keys = ['total', 'male', 'female']
 
 
-def insertdata(cursor, table, year, key, value):            # 插入数据，若存在，就更新
+def insertdata(cursor, table, year, key, value, type='year'):            # 插入数据，若存在，就更新
     try:
-        cursor.execute('insert into %s (year, %s) values (%s, %s)' % (table, key, year, value))
+        cursor.execute('insert into %s (%s, %s) values (%s, %s)' % (table, type, key, year, value))
     except sqlite3.IntegrityError:
         print('已经存在的数据，更新该数据。')
-        cursor.execute('update %s set %s=? where year=? ' % (table, key), (value, year))
+        cursor.execute('update %s set %s=? where %s=? ' % (table, key, type), (value, year))
     else:
         print('成功插入')
 
@@ -89,7 +89,7 @@ def getfrompatenttype():
     for i in range(0, 200):  # 最近八年总情况
         if getdata['returndata']['datanodes'][i]['wds'][1]['valuecode'] == '2016':
             insertdata(cursor, 'patent2016', str(int(i / 10)), 'patentnum',
-                       getdata['returndata']['datanodes'][i]['data']['data'])
+                       getdata['returndata']['datanodes'][i]['data']['data'], type='type')   # primary key为type
             # print(type(getdata['returndata']['datanodes'][i]['data']['strdata']))
     # 关闭Cursor:
     cursor.close()
